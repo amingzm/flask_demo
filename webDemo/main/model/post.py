@@ -11,7 +11,7 @@ class Post(db.Model):
 
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category',
-                               backref=db.backref('posts', lazy='dynamic'))
+                               backref=db.backref('posts', lazy='dynamic')) #正向与反向引用
 
     def __init__(self, title, body, category, pub_date=None):
         self.title = title
@@ -25,7 +25,7 @@ class Post(db.Model):
         return '<Post %r>' % self.title
 
 
-py = Category('Python')
-p = Post('Hello Python!', 'Python is pretty cool', py)
-db.session.add(py)
-db.session.add(p)
+# py = Category('Python')
+# p = Post('Hello Python!', 'Python is pretty cool', py)
+# db.session.add(py)
+# db.session.add(p)
