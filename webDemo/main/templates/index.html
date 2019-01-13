@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Blog | Category</title>
+</head>
+<body>
+    <div class="navbar-header">
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="sr-only">Blog | </span>
+      <a href="#" class="navbar-brand">简书归档</a>
+      </button>
+    </div>
+    <div id="navbar" class="collapse navbar-collapse bs-navbar-collapse">
+      {% for name in names %}
+          <ul class="nav navbar-nav">
+              <li><a href="#">{{ name }}</a></li>
+          </ul>
+      {% endfor %}
+    </div>
+</body>
+</html>

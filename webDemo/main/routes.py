@@ -2,15 +2,50 @@
 # @Time    : 2019/1/12 16:52
 # @Author  : Ming
 from . import app
-from flask import jsonify, request, render_template, session, abort, flash, redirect, url_for
+from flask import jsonify, render_template, session, abort, flash, redirect, url_for, request
 from .model.post import Post
 from .model.category import Category
 from .model.entries import *
-from .model import db
+from .model.article import *
+from .jianshu import *
+
+
+# 简书教程学习
+# https://www.jianshu.com/p/4bb97fe23272
+@app.route('/jianshu/save')
+def jianshu_save():
+    user_id = '40758c9db703'
+    user_url = 'https://www.jianshu.com/u/' + user_id
+    item_list = Item_jianshu(user_url).get_category()
+    '''建表'''
+    db.create_all()
+
+    # 存入数据库
+    for temp in item_list:
+        data = Item(category_name=temp[0], category_url=temp[1])
+        body = Body_jianshu(temp[1]).get_body()
+        article = Article(article_name=user_id, article_url=temp[1], article_text=body, category=data)
+        db.session.add_all([data, article])
+    db.session.commit()
+    return 'success'
+
+
+@app.route('/jianshu/get')
+def jianshu_get():
+    temp = Item.query.all()
+    return '%d' % len(temp)
+
+
+@app.route('/jianshu/show', methods=['GET'])
+def index():
+    category_names = []
+    category_query = Item.query.all()
+    for temp in category_query:
+        category_names.append(temp.category_name)
+    return render_template('index.html', names=category_names)
 
 
 # http://docs.jinkan.org/docs/flask/index.html教程学习
-
 @app.route('/')
 def show_entries():
     entries = Entry.query.order_by(Entry.id.desc()).all()
