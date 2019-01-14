@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2019/1/12 16:52
 # @Author  : Ming
+from sqlalchemy.exc import IntegrityError
+
 from . import app
-from flask import jsonify, render_template, session, abort, flash, redirect, url_for, request
+from flask import jsonify, render_template, session, abort, flash, redirect, url_for, request, logging
 from .model.post import Post
 from .model.category import Category
 from .model.entries import *
@@ -15,18 +17,26 @@ from .jianshu import *
 @app.route('/jianshu/save')
 def jianshu_save():
     user_id = '40758c9db703'
-    user_url = 'https://www.jianshu.com/u/' + user_id
-    item_list = Item_jianshu(user_url).get_category()
+    user_url = 'https://www.jianshu.com/u/' + user_id + '?order_by=shared_at&page='
     '''建表'''
     db.create_all()
+
+    item_list = Item_jianshu(user_url).get_category(1, [])
 
     # 存入数据库
     for temp in item_list:
         data = Item(category_name=temp[0], category_url=temp[1])
         body = Body_jianshu(temp[1]).get_body()
         article = Article(article_name=user_id, article_url=temp[1], article_text=body, category=data)
-        db.session.add_all([data, article])
-    db.session.commit()
+        try:
+            db.session.add_all([data, article])
+            db.session.commit()
+        except IntegrityError as e:
+            app.logger.debug(e)
+            db.session.rollback()
+        finally:
+            pass
+
     return 'success'
 
 
